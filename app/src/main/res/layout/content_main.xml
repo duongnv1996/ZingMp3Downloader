@@ -2,62 +2,93 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:visibility="gone"
-    android:id="@+id/ll_root"
+    android:visibility="visible"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.duongkk.zingmp3lossless.view.activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
 
-    <TextView
-        android:id="@+id/tv_song"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hay ve voi em"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/black"
-        android:textSize="24sp" />
-
-    <TextView
-        android:id="@+id/tv_auth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:textColor="@color/second_text"
-        android:text="Author" />
-
 
     <LinearLayout
-        android:id="@+id/ll_link"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@color/tran"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:paddingTop="36dp">
 
-        <Button
-            android:id="@+id/btn_128"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="128 kbps" />
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1.5"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_320"
+            <TextView
+                android:id="@+id/tv_song"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:text="Hôm nay tôi thật buồn"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="320 kbps" />
+            <TextView
+                android:id="@+id/tv_auth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Author"
+                android:textColor="@color/second_text" />
 
-        <Button
-            android:id="@+id/btn_lossless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Lossless" />
+            <FrameLayout
+                android:id="@+id/btn_128"
+                style="@style/frame_btn">
+
+                <TextView
+                    android:id="@+id/tv_128"
+
+                    style="@style/style_text_btn"
+                    android:text="128Kbps" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btn_320"
+                style="@style/frame_btn">
+
+                <TextView
+                    android:id="@+id/tv_320"
+                    style="@style/style_text_btn"
+                    android:text="320Kbps" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btn_lossless"
+                style="@style/frame_btn">
+
+                <TextView
+                    android:id="@+id/tv_ll"
+
+                    style="@style/style_text_btn"
+                    android:text="Lossless" />
+            </FrameLayout>
+
+        </LinearLayout>
+
+
     </LinearLayout>
+
 
 </LinearLayout>
