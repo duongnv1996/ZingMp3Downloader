@@ -1,28 +1,24 @@
 package com.duongkk.zingmp3lossless.view.activities;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,9 +46,8 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     TextView tvSong;
     @BindView(R.id.tv_auth)
     TextView tvAuth;
-
     @BindView(R.id.ll_root)
-    LinearLayout llRoot;
+    RelativeLayout llRoot;
     @BindView(R.id.fab)
     FloatingActionButton fab;
     @BindView(R.id.fab_open_download)
@@ -70,17 +65,13 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     private ZingModel model;
     private ProgressDialogCustom progressDialog;
     private DownloadManager downloadManager;
-    private long downloadReference;
     private String url;
     private String ext = ".mp3";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         mainPresenter = new MainPresenter(this);
         progressDialog = new ProgressDialogCustom(this);
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -108,8 +99,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     public void onGetInforSuccess(ZingModel model) {
         progressDialog.hideDialog();
         this.model = model;
-
-
         llRoot.setVisibility(View.VISIBLE);
         tvAuth.setText(model.getArtist());
         tvSong.setText(model.getTitle());
@@ -125,6 +114,12 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         if (model.getLink_download().getM320().isEmpty()) {
             btn320.setVisibility(View.GONE);
         }
+        fab.setVisibility(View.GONE);
+        fabOpenDownload.setVisibility(View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
     }
 
     @Override
@@ -133,13 +128,13 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         LogUtils.e(e.getMessage());
         Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
-
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
+//        startActivity(new Intent(this,AdsActivity.class));
+
         checkPermissionToDownload(url, model.getTitle() + ext);
     }
-
     private void checkPermissionToDownload(String url, String name) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
@@ -153,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
             downloadFile(url, name);
         }
     }
-
     private void downloadFile(String url, String name) {
         this.url = url;
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
@@ -161,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         request.setDescription(name);
         request.setDestinationInExternalPublicDir("/Download", name);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        downloadReference = downloadManager.enqueue(request);
+         downloadManager.enqueue(request);
     }
 
     @Override
@@ -173,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
             } else {
                 if (model != null && url != null)
                     downloadFile(url, model.getTitle());
-
             }
         }
     }
@@ -200,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         progressDialog.hideDialog();
         super.onStop();
     }
-
     @OnClick({R.id.btn_128, R.id.btn_320, R.id.btn_lossless})
     public void onViewClicked(View view) {
         if (model == null) return;
@@ -218,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         }
         progressDialog.showDialog();
     }
-
     @OnClick({R.id.fab, R.id.fab_open_download})
     public void onViewFabClicked(View view) {
         switch (view.getId()) {
@@ -237,51 +228,6 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     }
 
 
-    @SuppressLint("NewApi")
-    private Bitmap blurRenderScript(Bitmap smallBitmap, int radius) {
 
-        try {
-            smallBitmap = RGB565toARGB888(smallBitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        Bitmap bitmap = Bitmap.createBitmap(
-                smallBitmap.getWidth(), smallBitmap.getHeight(),
-                Bitmap.Config.ARGB_8888);
-
-        RenderScript renderScript = RenderScript.create(this);
-
-        Allocation blurInput = Allocation.createFromBitmap(renderScript, smallBitmap);
-        Allocation blurOutput = Allocation.createFromBitmap(renderScript, bitmap);
-
-        ScriptIntrinsicBlur blur = ScriptIntrinsicBlur.create(renderScript,
-                Element.U8_4(renderScript));
-        blur.setInput(blurInput);
-        blur.setRadius(radius); // radius must be 0 < r <= 25
-        blur.forEach(blurOutput);
-
-        blurOutput.copyTo(bitmap);
-        renderScript.destroy();
-
-        return bitmap;
-
-    }
-
-    private Bitmap RGB565toARGB888(Bitmap img) throws Exception {
-        int numPixels = img.getWidth() * img.getHeight();
-        int[] pixels = new int[numPixels];
-
-        //Get JPEG pixels.  Each int is the color values for one pixel.
-        img.getPixels(pixels, 0, img.getWidth(), 0, 0, img.getWidth(), img.getHeight());
-
-        //Create a Bitmap of the appropriate format.
-        Bitmap result = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.ARGB_8888);
-
-        //Set RGB pixels.
-        result.setPixels(pixels, 0, result.getWidth(), 0, 0, result.getWidth(), result.getHeight());
-        return result;
-    }
 
 }
