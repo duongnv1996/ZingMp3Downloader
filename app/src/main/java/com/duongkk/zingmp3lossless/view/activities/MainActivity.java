@@ -18,9 +18,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -28,7 +28,12 @@ import com.blankj.utilcode.util.LogUtils;
 import com.duongkk.zingmp3lossless.R;
 import com.duongkk.zingmp3lossless.model.ZingModel;
 import com.duongkk.zingmp3lossless.presenter.MainPresenter;
+import com.duongkk.zingmp3lossless.utils.CommonUtils;
 import com.duongkk.zingmp3lossless.view.customviews.ProgressDialogCustom;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -60,6 +65,14 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     TextView tv320;
     @BindView(R.id.tv_ll)
     TextView tvLl;
+    @BindView(R.id.faq)
+    LinearLayout faq;
+    @BindView(R.id.ll_rate)
+    LinearLayout llRate;
+    @BindView(R.id.img_header)
+    ImageView imgHeader;
+    @BindView(R.id.ll_infor)
+    LinearLayout llInfor;
 
     private MainPresenter mainPresenter;
     private ZingModel model;
@@ -67,9 +80,15 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     private DownloadManager downloadManager;
     private String url;
     private String ext = ".mp3";
+    private InterstitialAd mInterstitialAd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mainPresenter = new MainPresenter(this);
@@ -78,13 +97,48 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
+        //todo Add ADS
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-4447279115464296~5831517351");
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-4447279115464296/1108360637");
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // showInterstitial();
+            }
+
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                loadInterstitial();
+            }
+        });
+        loadInterstitial();
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
                 handleSendText(intent);
+                return;
             }
+        }
+//        Picasso.with(this).load(R.drawable.banner_full_size).into(imgHeader);
+        llRoot.setVisibility(View.GONE);
+    }
+
+
+    private void showInterstitial() {
+        if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+//            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
         }
     }
 
+    private void loadInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("1C8067A9CD67109A760B8802C99C0F4D")
+                .build();
+        mInterstitialAd.loadAd(adRequest);
+    }
 
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -116,25 +170,35 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         }
         fab.setVisibility(View.GONE);
         fabOpenDownload.setVisibility(View.GONE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+//        imgHeader.setVisibility(View.GONE);
+        llInfor.setVisibility(View.GONE);
+
     }
 
     @Override
     public void onFail(Exception e) {
         progressDialog.hideDialog();
         LogUtils.e(e.getMessage());
-        Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        new MaterialDialog.Builder(this).title(getString(R.string.error))
+                .content("Không thể lấy thông tin bài hát. Vui lòng thử lại!")
+                .positiveColor(Color.GRAY)
+                .positiveText("Đồng ý")
+                .cancelable(false)
+                .show();
+//        Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
 //        startActivity(new Intent(this,AdsActivity.class));
+        this.url = url;
 
         checkPermissionToDownload(url, model.getTitle() + ext);
+        showInterstitial();
+
     }
+
     private void checkPermissionToDownload(String url, String name) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
@@ -148,14 +212,15 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
             downloadFile(url, name);
         }
     }
+
     private void downloadFile(String url, String name) {
-        this.url = url;
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.setTitle(name.replace(ext, ""));
         request.setDescription(name);
-        request.setDestinationInExternalPublicDir("/Download", name);
+        request.setDestinationInExternalPublicDir("/Music", name);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-         downloadManager.enqueue(request);
+        downloadManager.enqueue(request);
+        fabOpenDownload.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -169,6 +234,12 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
                     downloadFile(url, model.getTitle());
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+//        showInterstitial();
     }
 
     private void showDialogPermission() {
@@ -193,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         progressDialog.hideDialog();
         super.onStop();
     }
+
     @OnClick({R.id.btn_128, R.id.btn_320, R.id.btn_lossless})
     public void onViewClicked(View view) {
         if (model == null) return;
@@ -210,6 +282,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         }
         progressDialog.showDialog();
     }
+
     @OnClick({R.id.fab, R.id.fab_open_download})
     public void onViewFabClicked(View view) {
         switch (view.getId()) {
@@ -227,7 +300,18 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         }
     }
 
-
+//
+    @OnClick({R.id.faq, R.id.ll_rate})
+    public void onViewLayoutClicked(View view) {
+        switch (view.getId()) {
+            case R.id.faq:
+                CommonUtils.shareEmail("duongkk.dev@gmail.com", this);
+                break;
+            case R.id.ll_rate:
+                CommonUtils.launchMarket(this, getPackageName());
+                break;
+        }
+    }
 
 
 }

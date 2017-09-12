@@ -12,6 +12,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.duongkk.zingmp3lossless.view.activities.MainActivity"
     tools:showIn="@layout/activity_main">
+
     <ImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
