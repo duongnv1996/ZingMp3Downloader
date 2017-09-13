@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless;
+package com.duongkk.zingmp3;
 
 import android.app.Application;
 

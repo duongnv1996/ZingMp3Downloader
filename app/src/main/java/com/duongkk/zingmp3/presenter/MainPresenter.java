@@ -1,9 +1,9 @@
-package com.duongkk.zingmp3lossless.presenter;
+package com.duongkk.zingmp3.presenter;
 
-import com.duongkk.zingmp3lossless.model.IZingCallback;
-import com.duongkk.zingmp3lossless.model.ZingManager;
-import com.duongkk.zingmp3lossless.model.ZingModel;
-import com.duongkk.zingmp3lossless.view.activities.IMainViewCallback;
+import com.duongkk.zingmp3.model.IZingCallback;
+import com.duongkk.zingmp3.model.ZingManager;
+import com.duongkk.zingmp3.model.ZingModel;
+import com.duongkk.zingmp3.view.activities.IMainViewCallback;
 
 /**
  * Created by DuongKK on 9/11/2017.

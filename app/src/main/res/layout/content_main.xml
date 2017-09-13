@@ -10,7 +10,7 @@
     android:visibility="gone"
     android:fitsSystemWindows="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.duongkk.zingmp3lossless.view.activities.MainActivity"
+    tools:context="com.duongkk.zingmp3.view.activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <ImageView
@@ -77,11 +77,11 @@
 
             <FrameLayout
                 android:id="@+id/btn_lossless"
-                style="@style/frame_btn">
+                style="@style/frame_btn"
+                android:layout_marginBottom="36dp">
 
                 <TextView
                     android:id="@+id/tv_ll"
-
                     style="@style/style_text_btn"
                     android:text="Lossless" />
             </FrameLayout>

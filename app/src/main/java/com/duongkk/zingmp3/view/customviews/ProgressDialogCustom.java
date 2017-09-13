@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.view.customviews;
+package com.duongkk.zingmp3.view.customviews;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 
-import com.duongkk.zingmp3lossless.R;
+import com.duongkk.zingmp3.R;
 
 
 /**

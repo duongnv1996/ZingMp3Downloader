@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.model;
+package com.duongkk.zingmp3.model;
 
 import retrofit2.Call;
 import retrofit2.Callback;

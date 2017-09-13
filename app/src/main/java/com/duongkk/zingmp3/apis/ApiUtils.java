@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.apis;
+package com.duongkk.zingmp3.apis;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

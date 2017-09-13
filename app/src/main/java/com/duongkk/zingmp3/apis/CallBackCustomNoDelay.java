@@ -1,7 +1,7 @@
-package com.duongkk.zingmp3lossless.apis;
+package com.duongkk.zingmp3.apis;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.duongkk.zingmp3lossless.interfaces.OnResponse;
+import com.duongkk.zingmp3.interfaces.OnResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;

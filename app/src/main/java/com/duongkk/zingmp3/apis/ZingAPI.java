@@ -1,7 +1,7 @@
-package com.duongkk.zingmp3lossless.apis;
+package com.duongkk.zingmp3.apis;
 
 
-import com.duongkk.zingmp3lossless.model.ZingModel;
+import com.duongkk.zingmp3.model.ZingModel;
 
 import retrofit2.Call;
 import retrofit2.http.Field;

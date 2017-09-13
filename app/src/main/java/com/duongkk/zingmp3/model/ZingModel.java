@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.model;
+package com.duongkk.zingmp3.model;
 
 import com.google.gson.annotations.SerializedName;
 

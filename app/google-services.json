@@ -88,6 +88,50 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628929486138:android:4bb710551efa8008",
+        "android_client_info": {
+          "package_name": "com.duongkk.zingmp3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "628929486138-spn37ejsauucl8o2p69tn5hhg5p9b0vd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.duongkk.zingmp3",
+            "certificate_hash": "3c2391de28e2e31885e143182a83835b749faf73"
+          }
+        },
+        {
+          "client_id": "628929486138-jif1gemdue3tr2kd708qo728p0eo7a6v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfLi22HsKQY71jWq1IGJE2IgHeLWrgeGc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "628929486138-jif1gemdue3tr2kd708qo728p0eo7a6v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

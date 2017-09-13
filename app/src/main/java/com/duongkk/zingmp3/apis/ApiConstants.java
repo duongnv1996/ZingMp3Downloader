@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.apis;
+package com.duongkk.zingmp3.apis;
 
 /**
  * Created by MyPC on 9/12/2016.

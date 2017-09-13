@@ -1,8 +1,8 @@
-package com.duongkk.zingmp3lossless.model;
+package com.duongkk.zingmp3.model;
 
 import com.blankj.utilcode.util.SPUtils;
-import com.duongkk.zingmp3lossless.apis.ApiUtils;
-import com.duongkk.zingmp3lossless.apis.ZingAPI;
+import com.duongkk.zingmp3.apis.ApiUtils;
+import com.duongkk.zingmp3.apis.ZingAPI;
 
 /**
  * Created by DuongKK on 9/11/2017.

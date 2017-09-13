@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.utils;
+package com.duongkk.zingmp3.utils;
 
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -19,8 +19,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.duongkk.zingmp3lossless.R;
-import com.duongkk.zingmp3lossless.view.activities.MainActivity;
+import com.duongkk.zingmp3.R;
+import com.duongkk.zingmp3.view.activities.MainActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.interfaces;
+package com.duongkk.zingmp3.interfaces;
 
 /**
  * Created by DuongKK on 6/14/2017.

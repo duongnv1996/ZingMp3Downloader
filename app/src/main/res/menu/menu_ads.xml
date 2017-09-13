@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.duongkk.zingmp3lossless.view.activities.AdsActivity">
+    tools:context="com.duongkk.zingmp3.view.activities.AdsActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

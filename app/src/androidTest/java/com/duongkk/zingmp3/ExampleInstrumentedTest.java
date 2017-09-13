@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless;
+package com.duongkk.zingmp3;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

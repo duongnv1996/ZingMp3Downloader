@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.duongkk.zingmp3lossless.view.activities.MainActivity">
+    tools:context="com.duongkk.zingmp3.view.activities.MainActivity">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -23,7 +23,7 @@
         android:layout_gravity="bottom|end"
         app:fabSize="normal"
         android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginBottom="86dp"
+        android:layout_marginBottom="105dp"
         app:srcCompat="@drawable/layer_album" />
 
     <android.support.design.widget.FloatingActionButton
@@ -31,7 +31,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="36dp"
         app:fabSize="normal"
         app:srcCompat="@drawable/layer_folder" />
 

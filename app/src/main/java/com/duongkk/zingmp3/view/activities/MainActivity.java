@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.view.activities;
+package com.duongkk.zingmp3.view.activities;
 
 import android.Manifest;
 import android.app.DownloadManager;
@@ -25,11 +25,11 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.utilcode.util.LogUtils;
-import com.duongkk.zingmp3lossless.R;
-import com.duongkk.zingmp3lossless.model.ZingModel;
-import com.duongkk.zingmp3lossless.presenter.MainPresenter;
-import com.duongkk.zingmp3lossless.utils.CommonUtils;
-import com.duongkk.zingmp3lossless.view.customviews.ProgressDialogCustom;
+import com.duongkk.zingmp3.R;
+import com.duongkk.zingmp3.model.ZingModel;
+import com.duongkk.zingmp3.presenter.MainPresenter;
+import com.duongkk.zingmp3.utils.CommonUtils;
+import com.duongkk.zingmp3.view.customviews.ProgressDialogCustom;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        showInterstitial();
+        showInterstitial();
     }
 
     private void showDialogPermission() {

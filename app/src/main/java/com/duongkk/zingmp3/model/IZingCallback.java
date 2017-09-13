@@ -1,4 +1,4 @@
-package com.duongkk.zingmp3lossless.model;
+package com.duongkk.zingmp3.model;
 
 /**
  * Created by DuongKK on 9/11/2017.
