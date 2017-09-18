@@ -23,7 +23,8 @@ public class ApiUtils {
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .build();
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiConstants.API_ROOT).client(okHttpClient).addConverterFactory(GsonConverterFactory.create(gson)).build();
+        //// TODO: 9/19/2017  change api
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiConstants.API_ROOT_TOOL).client(okHttpClient).addConverterFactory(GsonConverterFactory.create(gson)).build();
         return retrofit;
     }
 

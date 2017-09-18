@@ -24,7 +24,7 @@
         app:fabSize="normal"
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="105dp"
-        app:srcCompat="@drawable/layer_album" />
+        android:src="@drawable/layer_album" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_open_download"
@@ -34,6 +34,6 @@
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="36dp"
         app:fabSize="normal"
-        app:srcCompat="@drawable/layer_folder" />
+        android:src="@drawable/layer_folder" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -22,6 +22,9 @@ public class MainPresenter implements IZingCallback {
     public void getLink(String url) {
         mZingManager.getLinkDownload(url);
     }
+    public void getLinkTool(String url,String quality) {
+        mZingManager.getLinkToolDownload(url,quality);
+    }
     @Override
     public void onSucess(ZingModel zingModel) {
         if(zingModel.getResponse().getMsgCode()!=1){

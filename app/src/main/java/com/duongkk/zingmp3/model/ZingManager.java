@@ -1,5 +1,10 @@
 package com.duongkk.zingmp3.model;
 
+import com.duongkk.zingmp3.view.activities.MainToolActivity;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,6 +54,74 @@ public class ZingManager extends BaseManager {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                mZingCallBack.onFail(new Exception(t.getMessage()));
+            }
+        });
+
+    }
+
+    public void getLinkToolDownload(final String url, final String q) {
+        Call<ResponseBody> getZing = getmApi().downloadToolHighQ(q,url);
+        getZing.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.body() != null) {
+                    try {
+                        String result =response.body().string();
+//                        LogUtils.e(result);
+                        if(q.equals("lossless")) {
+                            if (result.contains("http://mp3.zing.vn")) {
+                                mZingCallBack.onFail(new Exception("No information was found"));
+                                return;
+                            }
+                            mZingCallBack.onGetLinkDownloadSucess(result.replace("Location: ",""));
+                        }else if(q.equals("320")) {
+                            if(result.contains("Acc vip hết hạn rồi")) {
+                                mZingCallBack.onFail(new Exception("No information was found"));
+                                return;
+                            }
+                            mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat,"320",url));
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    mZingCallBack.onFail(new Exception("No information was found"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                mZingCallBack.onFail(new Exception(t.getMessage()));
+            }
+        });
+
+    }
+
+    public void getLinkToolDownloadN(String url) {
+        Call<ResponseBody> getZing = getmApi().downloadToolHighQ("320",url);
+        getZing.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.body() != null) {
+                    try {
+                        String result =response.body().string();
+                        if(result.contains("http://mp3.zing.vn")) {
+                            mZingCallBack.onFail(new Exception("No information was found"));
+                            return;
+                        }
+                        mZingCallBack.onGetLinkDownloadSucess(result.replace("Location: ",""));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    mZingCallBack.onFail(new Exception("No information was found"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 mZingCallBack.onFail(new Exception(t.getMessage()));
             }
         });

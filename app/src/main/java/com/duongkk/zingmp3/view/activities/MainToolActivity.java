@@ -40,7 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements IMainViewCallback {
+public class MainToolActivity extends AppCompatActivity implements IMainViewCallback {
     @BindView(R.id.btn_128)
     FrameLayout btn128;
     @BindView(R.id.btn_320)
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     private String url;
     private String ext = ".mp3";
     private InterstitialAd mInterstitialAd;
+    private String linkMp3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,56 +144,54 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
-            progressDialog.showDialog();
-            mainPresenter.getInfor(sharedText);
+//            progressDialog.showDialog();
+//            mainPresenter.getInfor(sharedText);
+
+            linkMp3 = sharedText;
+            onGetInforSuccess(null);
+        } else {
+            showError();
         }
     }
 
 
     @Override
-    public void onGetInforSuccess(ZingModel model) {
+    public void onGetInforSuccess(ZingModel model2) {
         progressDialog.hideDialog();
-        this.model = model;
-        llRoot.setVisibility(View.VISIBLE);
+        this.model = new ZingModel();
+        String[] splits = linkMp3.split("/");
+        model.setTitle(splits[4].replace("-", " "));
+        model.setArtist("Tải xuống");
         tvAuth.setText(model.getArtist());
         tvSong.setText(model.getTitle());
-        if (!model.getThumbnail().isEmpty()) {
-            Picasso.with(this).load("http://zmp3-photo-td.zadn.vn/" + model.getThumbnail()).into(img);
-            Picasso.with(this).load(R.drawable.q).into(img);
-        }
-        if (model.getLink_download().getLossless().isEmpty()) {
-            btnLossless.setVisibility(View.GONE);
-        }
-        if (model.getLink_download().getM128().isEmpty()) {
-            btn128.setVisibility(View.GONE);
-        }
-        if (model.getLink_download().getM320().isEmpty()) {
-            btn320.setVisibility(View.GONE);
-        }
+        llRoot.setVisibility(View.VISIBLE);
+        Picasso.with(this).load(R.drawable.q).into(img);
         fab.setVisibility(View.GONE);
         fabOpenDownload.setVisibility(View.GONE);
-//        imgHeader.setVisibility(View.GONE);
+        imgHeader.setVisibility(View.GONE);
         llInfor.setVisibility(View.GONE);
-
     }
 
     @Override
     public void onFail(Exception e) {
         progressDialog.hideDialog();
         LogUtils.e(e.getMessage());
+        showError();
+//        Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void showError() {
         new MaterialDialog.Builder(this).title(getString(R.string.error))
                 .content("Không thể lấy thông tin bài hát. Vui lòng thử lại!")
                 .positiveColor(Color.GRAY)
                 .positiveText("Đồng ý")
                 .cancelable(false)
                 .show();
-//        Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
-//        startActivity(new Intent(this,AdsActivity.class));
         this.url = url;
         checkPermissionToDownload(url, model.getTitle() + ext);
         showInterstitial();
@@ -250,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        ActivityCompat.requestPermissions(MainActivity.this,
+                        ActivityCompat.requestPermissions(MainToolActivity.this,
                                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                         Manifest.permission.WRITE_EXTERNAL_STORAGE},
                                 10000);
@@ -264,22 +263,27 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         super.onStop();
     }
 
+    public final static String url_fomat = "http://htstar.design/mp3zing.php?q=%s&link=%s";
+
     @OnClick({R.id.btn_128, R.id.btn_320, R.id.btn_lossless})
     public void onViewClicked(View view) {
-        if (model == null) return;
+        ext = ".mp3";
         switch (view.getId()) {
             case R.id.btn_128:
-                mainPresenter.getLink(model.getLink_download().getM128());
+                onGetLinkSuccess(String.format(url_fomat, "128", linkMp3));
                 break;
             case R.id.btn_320:
-                mainPresenter.getLink(model.getLink_download().getM320());
+//                onGetLinkSuccess(String.format(url_fomat,"320",linkMp3));
+                progressDialog.showDialog();
+                mainPresenter.getLinkTool(linkMp3, "320");
                 break;
             case R.id.btn_lossless:
-                mainPresenter.getLink(model.getLink_download().getLossless());
+                progressDialog.showDialog();
+                mainPresenter.getLinkTool(linkMp3, "lossless");
                 ext = ".flac";
                 break;
         }
-        progressDialog.showDialog();
+
     }
 
     @OnClick({R.id.fab, R.id.fab_open_download})
@@ -299,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         }
     }
 
-//
+    //
     @OnClick({R.id.faq, R.id.ll_rate})
     public void onViewLayoutClicked(View view) {
         switch (view.getId()) {

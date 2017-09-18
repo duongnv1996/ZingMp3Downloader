@@ -6,9 +6,11 @@ package com.duongkk.zingmp3.apis;
 public class ApiConstants {
 
     public static final String API_ROOT="https://getlinkzing.herokuapp.com/";
+    public static final String API_ROOT_TOOL="http://htstar.design/";
 
     public static final String API_GETLINK="getlink.php";
     public static final String API_DOWNLOAD="download.php";
+    public static final String API_DOWNLOAD_TOOL="mp3zing.php";
 
     //CODE
     public static final int CODE_SUCESS = 200;
