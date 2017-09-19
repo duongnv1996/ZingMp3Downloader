@@ -1,5 +1,6 @@
 package com.duongkk.zingmp3.model;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.duongkk.zingmp3.view.activities.MainToolActivity;
 
 import java.io.IOException;
@@ -68,16 +69,15 @@ public class ZingManager extends BaseManager {
                 if (response.body() != null) {
                     try {
                         String result =response.body().string();
-//                        LogUtils.e(result);
                         if(q.equals("lossless")) {
                             if (result.contains("http://mp3.zing.vn")) {
-                                mZingCallBack.onFail(new Exception("No information was found"));
+                                mZingCallBack.onFail(new Exception(result));
                                 return;
                             }
                             mZingCallBack.onGetLinkDownloadSucess(result.replace("Location: ",""));
                         }else if(q.equals("320")) {
                             if(result.contains("Acc vip hết hạn rồi")) {
-                                mZingCallBack.onFail(new Exception("No information was found"));
+                                mZingCallBack.onFail(new Exception(result));
                                 return;
                             }
                             mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat,"320",url));
