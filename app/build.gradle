@@ -22,7 +22,7 @@ android {
         applicationId "com.duongkk.zingmp3"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 5
+        versionCode 7
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -54,7 +54,7 @@ dependencies {
     compile 'com.google.firebase:firebase-ads:11.2.2'
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-
+    compile 'org.jsoup:jsoup:1.10.3'
 
     //Utils
     compile 'com.blankj:utilcode:1.5.1'

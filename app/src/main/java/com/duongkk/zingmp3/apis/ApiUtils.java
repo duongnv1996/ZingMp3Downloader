@@ -27,7 +27,16 @@ public class ApiUtils {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiConstants.API_ROOT_TOOL).client(okHttpClient).addConverterFactory(GsonConverterFactory.create(gson)).build();
         return retrofit;
     }
-
+    public static Retrofit getRootZingMp3Api() {
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Gson gson = new GsonBuilder().setLenient().disableHtmlEscaping().create();
+        //// TODO: 9/19/2017  change api
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://mp3.zing.vn/").client(okHttpClient).addConverterFactory(GsonConverterFactory.create(gson)).build();
+        return retrofit;
+    }
 
     public static RequestBody createPartFromString(String descriptionString) {
         return RequestBody.create(

@@ -26,6 +26,9 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.blankj.utilcode.util.LogUtils;
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.duongkk.zingmp3.R;
 import com.duongkk.zingmp3.model.ZingModel;
 import com.duongkk.zingmp3.presenter.MainPresenter;
@@ -83,9 +86,12 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     private String ext = ".mp3";
     private InterstitialAd mInterstitialAd;
     private String linkMp3;
+    private boolean is128 = false;
+
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +101,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        Answers.getInstance().logContentView(new ContentViewEvent());
         mainPresenter = new MainPresenter(this);
         progressDialog = new ProgressDialogCustom(this);
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -124,7 +131,6 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                 return;
             }
         }
-//        Picasso.with(this).load(R.drawable.banner_full_size).into(imgHeader);
         llRoot.setVisibility(View.GONE);
     }
 
@@ -133,7 +139,6 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
         } else {
-//            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -147,11 +152,9 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     private void handleSendText(Intent intent) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null) {
-//            progressDialog.showDialog();
-//            mainPresenter.getInfor(sharedText);
-
+            progressDialog.showDialog();
+            mainPresenter.getInfor(sharedText);
             linkMp3 = sharedText;
-            onGetInforSuccess(null);
         } else {
             showError();
         }
@@ -161,26 +164,29 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     @Override
     public void onGetInforSuccess(ZingModel model2) {
         progressDialog.hideDialog();
-        this.model = new ZingModel();
-        String[] splits = linkMp3.split("/");
-        model.setTitle(splits[4].replace("-", " "));
-        model.setArtist("Tải xuống");
+        this.model = model2;
         tvAuth.setText(model.getArtist());
         tvSong.setText(model.getTitle());
         llRoot.setVisibility(View.VISIBLE);
-        Picasso.with(this).load(R.drawable.q).into(img);
+        if (model.getThumbnail() != null && !model.getThumbnail().isEmpty()) {
+            Picasso.with(this).load(model.getThumbnail()).into(img);
+        } else {
+//            Picasso.with(this).load(R.drawable.q).into(img);
+        }
         fab.setVisibility(View.GONE);
         fabOpenDownload.setVisibility(View.GONE);
         imgHeader.setVisibility(View.GONE);
         llInfor.setVisibility(View.GONE);
     }
-
     @Override
     public void onFail(Exception e) {
         progressDialog.hideDialog();
         LogUtils.e(e.getMessage());
+
         showError();
-//        Toast.makeText(this, "Could not get information! \n" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        Crashlytics.log("Link: " + linkMp3 + "\nerror: " + e.getMessage() + "\nos: " + android.os.Build.MODEL);
+        Crashlytics.setInt("current_level", 3);
+        Crashlytics.setString("last_UI_action", "logged_in");
     }
 
     private void showError() {
@@ -197,7 +203,9 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         progressDialog.hideDialog();
         this.url = url;
         checkPermissionToDownload(url, model.getTitle() + ext);
-        showInterstitial();
+        if (!is128) {
+            showInterstitial();
+        }
     }
 
     private void checkPermissionToDownload(String url, String name) {
@@ -271,8 +279,10 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     @OnClick({R.id.btn_128, R.id.btn_320, R.id.btn_lossless})
     public void onViewClicked(View view) {
         ext = ".mp3";
+        is128 = false;
         switch (view.getId()) {
             case R.id.btn_128:
+                is128 = true;
                 onGetLinkSuccess(String.format(url_fomat, "128", linkMp3));
                 break;
             case R.id.btn_320:

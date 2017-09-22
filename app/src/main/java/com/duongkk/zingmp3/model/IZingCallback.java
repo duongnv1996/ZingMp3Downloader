@@ -6,6 +6,7 @@ package com.duongkk.zingmp3.model;
 
 public interface IZingCallback {
     void onSucess(ZingModel zingModel);
+    void onSucess(ZingMp3Reponse zingModel);
     void onFail(Exception e);
     void onGetLinkDownloadSucess(String url);
 }

@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements IMainViewCallback
         tvSong.setText(model.getTitle());
         if (!model.getThumbnail().isEmpty()) {
             Picasso.with(this).load("http://zmp3-photo-td.zadn.vn/" + model.getThumbnail()).into(img);
-            Picasso.with(this).load(R.drawable.q).into(img);
+//            Picasso.with(this).load(R.drawable.q).into(img);
         }
         if (model.getLink_download().getLossless().isEmpty()) {
             btnLossless.setVisibility(View.GONE);
