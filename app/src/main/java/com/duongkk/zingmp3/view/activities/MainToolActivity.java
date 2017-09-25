@@ -2,11 +2,13 @@ package com.duongkk.zingmp3.view.activities;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +32,7 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.duongkk.zingmp3.R;
+import com.duongkk.zingmp3.apis.DownloadService;
 import com.duongkk.zingmp3.model.ZingModel;
 import com.duongkk.zingmp3.presenter.MainPresenter;
 import com.duongkk.zingmp3.utils.CommonUtils;
@@ -87,10 +90,38 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     private InterstitialAd mInterstitialAd;
     private String linkMp3;
     private boolean is128 = false;
-
+    private MaterialDialog dialog;
+    private String quality = "128";
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
+                DownloadManager.Query query = new DownloadManager.Query();
+                query.setFilterById(intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0));
+                DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                Cursor cursor = manager.query(query);
+                if (cursor.moveToFirst()) {
+                    if (cursor.getCount() > 0) {
+                        int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                            String file = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
+                            // So something here on success
+                            LogUtils.e(file);
+                        } else {
+                            int message = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_REASON));
+                            // So something here on failed.
+                            LogUtils.e(message);
+
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,11 +209,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         imgHeader.setVisibility(View.GONE);
         llInfor.setVisibility(View.GONE);
     }
+
     @Override
     public void onFail(Exception e) {
         progressDialog.hideDialog();
         LogUtils.e(e.getMessage());
-
         showError();
         Crashlytics.log("Link: " + linkMp3 + "\nerror: " + e.getMessage() + "\nos: " + android.os.Build.MODEL);
         Crashlytics.setInt("current_level", 3);
@@ -190,25 +221,46 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     }
 
     private void showError() {
-        new MaterialDialog.Builder(this).title(getString(R.string.error))
-                .content("Không thể lấy thông tin bài hát. Vui lòng thử lại!")
-                .positiveColor(Color.GRAY)
-                .positiveText("Đồng ý")
-                .cancelable(false)
-                .show();
+        if (dialog == null) {
+            dialog = new MaterialDialog.Builder(this).title(getString(R.string.error))
+                    .content("Không thể lấy thông tin bài hát. Vui lòng thử lại!")
+                    .positiveColor(Color.GRAY)
+                    .positiveText("Đồng ý")
+                    .cancelable(false).build();
+
+        }
+        dialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter i = new IntentFilter();
+        i.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        i.addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED);
+        registerReceiver(receiver,i);
     }
 
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
         this.url = url;
-        checkPermissionToDownload(url, model.getTitle() + ext);
+        checkPermissionToDownload(url, model.getTitle() + ext,quality);
         if (!is128) {
             showInterstitial();
         }
     }
 
-    private void checkPermissionToDownload(String url, String name) {
+    private void checkPermissionToDownload(String url, String name,String quality) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this,
@@ -218,17 +270,25 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                             Manifest.permission.READ_EXTERNAL_STORAGE},
                     10000);
         } else {
-            downloadFile(url, name);
+            this.quality = quality;
+            downloadFile(url, name,quality);
         }
     }
 
-    private void downloadFile(String url, String name) {
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setTitle(name.replace(ext, ""));
-        request.setDescription(name);
-        request.setDestinationInExternalPublicDir("/Music", name);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        downloadManager.enqueue(request);
+    private void downloadFile(String url, String name,String quality) {
+//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+//        request.setTitle(name.replace(ext, ""));
+//        request.setMimeType("audio/MP3");
+//        request.setDescription(name);
+//        request.setDestinationInExternalPublicDir("/Music", name);
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        downloadManager.enqueue(request);
+
+        Intent intent = new Intent(this,DownloadService.class);
+        intent.putExtra("url",url);
+        intent.putExtra("q",quality);
+        intent.putExtra("name",name);
+        startService(intent);
         fabOpenDownload.setVisibility(View.VISIBLE);
     }
 
@@ -236,11 +296,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 10000) {
-            if (grantResults[0] == PackageManager.PERMISSION_DENIED || grantResults[1] == PackageManager.PERMISSION_DENIED) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 showDialogPermission();
             } else {
                 if (model != null && url != null)
-                    downloadFile(url, model.getTitle());
+                    downloadFile(url, model.getTitle(),quality);
             }
         }
     }
@@ -274,7 +334,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         super.onStop();
     }
 
-    public final static String url_fomat = "http://htstar.design/mp3zing.php?q=%s&link=%s";
+    public final static String url_fomat = "%s";
 
     @OnClick({R.id.btn_128, R.id.btn_320, R.id.btn_lossless})
     public void onViewClicked(View view) {
@@ -283,15 +343,18 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         switch (view.getId()) {
             case R.id.btn_128:
                 is128 = true;
-                onGetLinkSuccess(String.format(url_fomat, "128", linkMp3));
+                quality ="128";
+                onGetLinkSuccess(String.format(url_fomat, linkMp3));
                 break;
             case R.id.btn_320:
 //                onGetLinkSuccess(String.format(url_fomat,"320",linkMp3));
                 progressDialog.showDialog();
+                quality ="320";
                 mainPresenter.getLinkTool(linkMp3, "320");
                 break;
             case R.id.btn_lossless:
                 progressDialog.showDialog();
+                quality ="lossless";
                 mainPresenter.getLinkTool(linkMp3, "lossless");
                 ext = ".flac";
                 break;
@@ -312,6 +375,10 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                 break;
             case R.id.fab_open_download:
                 startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
+//                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Music/");
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(Uri.fromFile(file), "*/*");
+//                startActivity(Intent.createChooser(intent, getString(R.string.action_downloaded)));
                 break;
         }
     }

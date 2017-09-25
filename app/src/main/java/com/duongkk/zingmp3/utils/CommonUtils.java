@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
@@ -23,12 +24,22 @@ import com.duongkk.zingmp3.R;
 import com.duongkk.zingmp3.view.activities.MainActivity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.text.SimpleDateFormat;
 
 /**
  * Created by MyPC on 6/28/2016.
  */
 public class CommonUtils {
+    public static String getFolder(Context context) {
+        String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator
+                + "Music/";// +fileName;
+        File folder = new File(filePath);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        return filePath;
+    }
     public static final String YES_ACTION ="YES_ACTION" ;
     public static void launchApp(Context mContext, String packageName) {
         try {

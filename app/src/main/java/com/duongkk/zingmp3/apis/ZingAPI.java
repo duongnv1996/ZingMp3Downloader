@@ -34,4 +34,6 @@ public interface ZingAPI {
     @GET("{url}")
     Call<ZingMp3Reponse> getInforZingMp3(@Path(value = "url",encoded = true) String url
     );
+    @GET("mp3zing.php")
+    Call<ResponseBody> getDownload(@Query("q")String q,@Query(value = "link",encoded = true) String url);
 }

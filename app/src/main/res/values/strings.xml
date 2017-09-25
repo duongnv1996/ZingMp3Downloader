@@ -13,4 +13,5 @@
         For more information, see https://support.google.com/admob/answer/3052638
     <!- -->
     <string name="interstitial_ad_unit_id">ca-app-pub-4447279115464296/9742842200</string>
+    <string name="action_downloaded">Chooser app</string>
 </resources>

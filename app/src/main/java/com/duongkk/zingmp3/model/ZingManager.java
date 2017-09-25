@@ -53,7 +53,7 @@ public class ZingManager extends BaseManager {
                     return urlInfo;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    mZingCallBack.onFail(new Exception("No information was found"));
+                    mZingCallBack.onFail(e);
                     return null;
                 }
             }
@@ -61,16 +61,21 @@ public class ZingManager extends BaseManager {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                ZingMp3Reponse model = new ZingMp3Reponse();
-                ZingMp3Reponse.Data data = new ZingMp3Reponse.Data();
-                String[] splits = url.split("/");
-                data.setName(splits[4].replace("-", " "));
-                data.setArtist("Tải xuống");
-                data.setThumb(urlThumbnail);
-                List<ZingMp3Reponse.Data> list = new ArrayList<ZingMp3Reponse.Data>();
-                list.add(data);
-                model.setData(list);
-                mZingCallBack.onSucess(model);
+                try {
+                    ZingMp3Reponse model = new ZingMp3Reponse();
+                    ZingMp3Reponse.Data data = new ZingMp3Reponse.Data();
+                    String[] splits = url.split("/");
+                    data.setName(splits[splits.length - 2].replace("-", " "));    //todo change index 4 -> length -2
+                    data.setArtist("Tải xuống");
+                    data.setThumb(urlThumbnail);
+                    List<ZingMp3Reponse.Data> list = new ArrayList<ZingMp3Reponse.Data>();
+                    list.add(data);
+                    model.setData(list);
+                    mZingCallBack.onSucess(model);
+                } catch (Exception e) {
+                    mZingCallBack.onFail(e);
+                }
+
             }
         }.execute();
     }
@@ -83,7 +88,7 @@ public class ZingManager extends BaseManager {
                 if (response.body() != null) {
                     mZingCallBack.onGetLinkDownloadSucess(response.body());
                 } else {
-                    mZingCallBack.onFail(new Exception("No information was found"));
+                    mZingCallBack.onFail(new Exception("body null"));
                 }
             }
 
@@ -101,12 +106,15 @@ public class ZingManager extends BaseManager {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.body() != null) {
-                  if(response.body().contentType().type().equals("audio")){
-                      mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat, q, url));
-                      return;
-                  }
-                    mZingCallBack.onFail(new Exception("No information was found"));
-
+                    if (response.body().contentType().type().equals("audio")) {
+                        mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat,  url));
+                        return;
+                    }
+                    try {
+                        mZingCallBack.onFail(new Exception("Not audio response"+response.body().string()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 //                    try {
 //                        String result = response.body().string();
 //                        if (q.equals("lossless")) {
@@ -127,10 +135,9 @@ public class ZingManager extends BaseManager {
 //                        e.printStackTrace();
 //                    }
                 } else {
-                    mZingCallBack.onFail(new Exception("No information was found"));
+                    mZingCallBack.onFail(new Exception("Không thể kết nối"));
                 }
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 mZingCallBack.onFail(new Exception(t.getMessage()));
