@@ -62,8 +62,6 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     RelativeLayout llRoot;
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    @BindView(R.id.fab_open_download)
-    FloatingActionButton fabOpenDownload;
     @BindView(R.id.img)
     ImageView img;
     @BindView(R.id.tv_128)
@@ -205,7 +203,6 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
 //            Picasso.with(this).load(R.drawable.q).into(img);
         }
         fab.setVisibility(View.GONE);
-        fabOpenDownload.setVisibility(View.GONE);
         imgHeader.setVisibility(View.GONE);
         llInfor.setVisibility(View.GONE);
     }
@@ -229,7 +226,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                     .cancelable(false).build();
 
         }
-        dialog.show();
+        try {
+            dialog.show();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -289,7 +290,6 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         intent.putExtra("q",quality);
         intent.putExtra("name",name);
         startService(intent);
-        fabOpenDownload.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -362,7 +362,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
 
     }
 
-    @OnClick({R.id.fab, R.id.fab_open_download})
+    @OnClick({R.id.fab})
     public void onViewFabClicked(View view) {
         switch (view.getId()) {
             case R.id.fab:
@@ -373,13 +373,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                     e.printStackTrace();
                 }
                 break;
-            case R.id.fab_open_download:
-                startActivity(new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS));
-//                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/Music/");
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setDataAndType(Uri.fromFile(file), "*/*");
-//                startActivity(Intent.createChooser(intent, getString(R.string.action_downloaded)));
-                break;
+
         }
     }
 

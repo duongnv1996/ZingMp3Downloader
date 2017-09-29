@@ -1,18 +1,14 @@
 package com.duongkk.zingmp3.utils;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.v4.app.TaskStackBuilder;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
@@ -21,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.duongkk.zingmp3.R;
-import com.duongkk.zingmp3.view.activities.MainActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -501,22 +496,7 @@ public class CommonUtils {
 //
 
 
-public static void createNotificationWithMsg(Context context, String msg){
-    android.support.v7.app.NotificationCompat.Builder builder = new android.support.v7.app.NotificationCompat.Builder(context);
-    builder.setSmallIcon(R.mipmap.ic_launcher);
-    builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher));
-    builder.setContentTitle(context.getString(R.string.app_name));
-    builder.setContentText(msg);
-    builder.setAutoCancel(true).setOngoing(false);
-    TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-    stackBuilder.addParentStack(MainActivity.class);
-    Intent intentMain = new Intent(context,MainActivity.class);
-    stackBuilder.addNextIntent(intentMain);
-    PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_CANCEL_CURRENT);
-    builder.setContentIntent(pendingIntent);
-    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationManager.notify(2, builder.build());
-}
+
     public static String getStringImage(Bitmap bmp){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
