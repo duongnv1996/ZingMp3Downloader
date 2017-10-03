@@ -90,9 +90,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
     private boolean is128 = false;
     private MaterialDialog dialog;
     private String quality = "128";
+
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -228,7 +230,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         }
         try {
             dialog.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -248,20 +250,26 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         IntentFilter i = new IntentFilter();
         i.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         i.addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED);
-        registerReceiver(receiver,i);
+        registerReceiver(receiver, i);
     }
 
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
         this.url = url;
-        checkPermissionToDownload(url, model.getTitle() + ext,quality);
+        String fullnamefile;
+        if (quality.equals("lossless")) {
+            fullnamefile = model.getTitle() + ext;
+        } else {
+            fullnamefile = model.getTitle() + " (" +  quality + "kbs" + ")" + ext;
+        }
+        checkPermissionToDownload(url, fullnamefile, quality);
         if (!is128) {
             showInterstitial();
         }
     }
 
-    private void checkPermissionToDownload(String url, String name,String quality) {
+    private void checkPermissionToDownload(String url, String name, String quality) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this,
@@ -272,11 +280,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                     10000);
         } else {
             this.quality = quality;
-            downloadFile(url, name,quality);
+            downloadFile(url, name, quality);
         }
     }
 
-    private void downloadFile(String url, String name,String quality) {
+    private void downloadFile(String url, String name, String quality) {
 //        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 //        request.setTitle(name.replace(ext, ""));
 //        request.setMimeType("audio/MP3");
@@ -285,10 +293,10 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
 //        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 //        downloadManager.enqueue(request);
 
-        Intent intent = new Intent(this,DownloadService.class);
-        intent.putExtra("url",url);
-        intent.putExtra("q",quality);
-        intent.putExtra("name",name);
+        Intent intent = new Intent(this, DownloadService.class);
+        intent.putExtra("url", url);
+        intent.putExtra("q", quality);
+        intent.putExtra("name", name);
         startService(intent);
     }
 
@@ -300,7 +308,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                 showDialogPermission();
             } else {
                 if (model != null && url != null)
-                    downloadFile(url, model.getTitle(),quality);
+                    downloadFile(url, model.getTitle(), quality);
             }
         }
     }
@@ -343,18 +351,18 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         switch (view.getId()) {
             case R.id.btn_128:
                 is128 = true;
-                quality ="128";
+                quality = "128";
                 onGetLinkSuccess(String.format(url_fomat, linkMp3));
                 break;
             case R.id.btn_320:
 //                onGetLinkSuccess(String.format(url_fomat,"320",linkMp3));
                 progressDialog.showDialog();
-                quality ="320";
+                quality = "320";
                 mainPresenter.getLinkTool(linkMp3, "320");
                 break;
             case R.id.btn_lossless:
                 progressDialog.showDialog();
-                quality ="lossless";
+                quality = "lossless";
                 mainPresenter.getLinkTool(linkMp3, "lossless");
                 ext = ".flac";
                 break;

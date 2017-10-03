@@ -105,7 +105,7 @@ public class ZingManager extends BaseManager {
         getZing.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.body() != null) {
+                if (response.body() != null && response.body().contentType() != null && response.body().contentType().type()!=null) {
                     if (response.body().contentType().type().equals("audio")) {
                         mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat,  url));
                         return;
@@ -115,25 +115,6 @@ public class ZingManager extends BaseManager {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-//                    try {
-//                        String result = response.body().string();
-//                        if (q.equals("lossless")) {
-//                            if (result.contains("zmp3-mp3-lossless.zadn.vn")) {
-//                                mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat, "lossless", url));
-//                                return;
-//                            }
-//                            mZingCallBack.onFail(new Exception(result));
-//                        } else if (q.equals("320")) {
-//                            if (result.contains("Acc vip hết hạn rồi")) {
-//                                mZingCallBack.onFail(new Exception(result));
-//                                return;
-//                            }
-//                            mZingCallBack.onGetLinkDownloadSucess(String.format(MainToolActivity.url_fomat, "320", url));
-//                        }
-//
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
                 } else {
                     mZingCallBack.onFail(new Exception("Không thể kết nối"));
                 }
@@ -143,7 +124,6 @@ public class ZingManager extends BaseManager {
                 mZingCallBack.onFail(new Exception(t.getMessage()));
             }
         });
-
     }
 
 }
