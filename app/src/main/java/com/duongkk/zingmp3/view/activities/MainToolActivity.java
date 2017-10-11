@@ -252,12 +252,11 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
         i.addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED);
         registerReceiver(receiver, i);
     }
-
+    String fullnamefile="";
     @Override
     public void onGetLinkSuccess(String url) {
         progressDialog.hideDialog();
         this.url = url;
-        String fullnamefile;
         if (quality.equals("lossless")) {
             fullnamefile = model.getTitle() + ext;
         } else {
@@ -308,7 +307,7 @@ public class MainToolActivity extends AppCompatActivity implements IMainViewCall
                 showDialogPermission();
             } else {
                 if (model != null && url != null)
-                    downloadFile(url, model.getTitle(), quality);
+                    downloadFile(url,fullnamefile, quality);
             }
         }
     }
